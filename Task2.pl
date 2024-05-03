@@ -53,3 +53,63 @@ getBestState(Open, BestChild, Rest):-
     findMin(Open, BestChild),
     delete(Open, BestChild, Rest).
 
+findMin([X], X):- !.
+findMin([Head|T], Min):-
+    findMin(T, TmpMin),
+    Head = [_, _, _, _, HeadF],
+    TmpMin = [_, _, _, _, TmpF],
+    (TmpF < HeadF -> Min = TmpMin ; Min = Head).
+
+printSolution([State, null, _, _, _], _):-
+    write("Solution: "), nl,
+     write(State).
+
+printSolution([State, Parent, _, _, _], Closed):-
+    member([Parent, GrandParent, PrevG, Ph, Pf], Closed),
+    printSolution([Parent, GrandParent, PrevG, Ph, Pf], Closed),
+    write(' -> '),write(State).
+
+assignRow([], _, _).
+assignRow([Color|Cols], RowNum, ColNum) :-
+    write('Enter color for cell ['), write(RowNum), write(','), write(ColNum), write('] (R, Y, B): '), nl,
+    read(Color),
+    NewColNum is ColNum + 1,
+    assignRow(Cols, RowNum, NewColNum).
+
+assignBoard([], _, _).
+assignBoard([Row|Rows], RowNum, Cols) :-
+    RowNum >= 0,
+    length(Row, Cols),
+    assignRow(Row, RowNum, 0), % Start column index from 0
+    NewRowNum is RowNum + 1, % Increase row index by 1
+    assignBoard(Rows, NewRowNum, Cols). % Recursively initialize the next row
+
+search([], _, _) :-
+    write('Solution doesnt exist'), nl, !.
+    
+search(Open, Closed, Goal, _):-
+    getBestState(Open, [CurrentState, Parent, G, H, F], _),
+    CurrentState = Goal,
+    write("Search is complete!"), nl,
+    printSolution([CurrentState, Parent, G, H, F], Closed), !.
+
+search(Open, Closed, Goal, Board):-
+    getBestState(Open, CurrentNode, TmpOpen),
+    getAllValidChildren(Board, CurrentNode, TmpOpen, Closed, Goal, Children),
+    addChildren(Children, TmpOpen, NewOpen), 
+    append(Closed, [CurrentNode], NewClosed),
+    search(NewOpen, NewClosed, Goal, Board).
+
+main :-
+    write('# of rows: '), nl,
+    read(Rows),
+    write('# of columns: '), nl,
+    read(Cols),
+    RowNum is 0, % Start row index from 0
+    length(Board, Rows),
+    assignBoard(Board, RowNum, Cols),
+    write('Enter [x,y] for the start position : '), nl,
+    read(Start),
+    write('Enter [x,y] for the goal position : '), nl,
+    read(Goal),
+    search([[Start, null, 0, 0, 0]], [], Goal, Board).
