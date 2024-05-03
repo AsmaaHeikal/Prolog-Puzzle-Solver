@@ -71,7 +71,7 @@ printSolution([State, Parent, _, _, _], Closed):-
 
 assignRow([], _, _).
 assignRow([Color|Cols], RowNum, ColNum) :-
-    write('Enter color for cell ['), write(RowNum), write(','), write(ColNum), write('] (R, Y, B): '), nl,
+    write('Enter color for cell ['), write(RowNum), write(','), write(ColNum), write('] (r, y, b): '), nl,
     read(Color),
     NewColNum is ColNum + 1,
     assignRow(Cols, RowNum, NewColNum).
@@ -84,9 +84,8 @@ assignBoard([Row|Rows], RowNum, Cols) :-
     NewRowNum is RowNum + 1, % Increase row index by 1
     assignBoard(Rows, NewRowNum, Cols). % Recursively initialize the next row
 
-search([], _, _) :-
-    write('Solution doesnt exist'), nl, !.
-    
+search([], _, _,_) :-    
+     write('No path exists'), nl, !.
 search(Open, Closed, Goal, _):-
     getBestState(Open, [CurrentState, Parent, G, H, F], _),
     CurrentState = Goal,
