@@ -20,8 +20,8 @@ calculateHeuristic([X1, Y1], [X2, Y2], H) :-
     H is abs(X2 - X1) + abs(Y2 - Y1).
 
 isValidNodeAndColor(Board, [X, Y], [NewX, NewY]) :-
-    nth0(X, Board, Row),
-    nth0(Y, Row, Color),
+    nth0(X, Board, Row), %gets the xth row
+    nth0(Y, Row, Color),%gets the yth element of the xth row
     length(Row, RowLength),
     length(Board, BoardLength),
     NewX >= 0, NewX < BoardLength, NewY >= 0, NewY < RowLength,
@@ -44,10 +44,10 @@ memberButBetter(Next, List, NewF):-
     MinOldF > NewF.
 
 getAllValidChildren(Board, Node, Open, Closed, Goal, Children):-
-    findall(Next, getNextState(Board, Node, Open, Closed, Goal, Next), Children).
+    findall(Next, getNextState(Board, Node, Open, Closed, Goal, Next), Children).%find all possible Next states that can be reached from Node
 
 addChildren(Children, Open, NewOpen):-
-    append(Open, Children, NewOpen).
+    append(Open, Children, NewOpen).%open+children
 
 getBestState(Open, BestChild, Rest):-
     findMin(Open, BestChild),
@@ -86,6 +86,7 @@ assignBoard([Row|Rows], RowNum, Cols) :-
 
 search([], _, _,_) :-    
      write('No path exists'), nl, !.
+     
 search(Open, Closed, Goal, _):-
     getBestState(Open, [CurrentState, Parent, G, H, F], _),
     CurrentState = Goal,
